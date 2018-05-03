@@ -23,7 +23,7 @@ fun main(args : Array<String>) {
     var stpappEvents = HashMap<Long, VEvent>()
     var minDay = fetchStpAppLectures(username, password, group, stpappEvents)
     var stpappCal = fetchCampusDualLectures(matriculationNumber = "5000923", hash = "e1434034bda56b611b7d244f87e2301f",
-            minDay = minDay, stpappEvents = stpappEvents)
+            minDay = minDay, stpappEvents = stpappEvents, globalCal = globalCal)
 
     File("./stpAndMeal.ical").writeText(Biweekly.write(globalCal).go(), Charset.forName("UTF-8"))
     File("./stp.ical").writeText(Biweekly.write(stpappCal).go(), Charset.forName("UTF-8"))
@@ -43,7 +43,7 @@ fun parseHourDate(hourDate : String) : HourDate {
     return HourDate(hour, minute)
 }
 
-fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: Long, stpappEvents: Map<Long, VEvent>) : ICalendar {
+fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: Long, stpappEvents: Map<Long, VEvent>, globalCal: ICalendar) : ICalendar {
     var startTime = System.currentTimeMillis()
     var resp = Unirest.get("https://selfservice.campus-dual.de/room/json?userid=$matriculationNumber&hash=$hash") //start and end should be recognized in the response.....they should
             .asJson()
@@ -89,6 +89,7 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
             event.setDescription(description)
             println(description)
             cal.events.add(event)
+            globalCal.events.add(event)
         }
     }
     return cal
