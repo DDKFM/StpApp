@@ -45,8 +45,7 @@ fun parseHourDate(hourDate : String) : HourDate {
 
 fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: Long, stpappEvents: Map<Long, VEvent>) : ICalendar {
     var startTime = System.currentTimeMillis()
-    var resp = Unirest.get("https://selfservice.campus-dual.de/room/json?userid=$matriculationNumber" +
-            "&hash=$hash") //start and end should be recognized in the response.....they should
+    var resp = Unirest.get("https://selfservice.campus-dual.de/room/json?userid=$matriculationNumber&hash=$hash") //start and end should be recognized in the response.....they should
             .asJson()
             .body
             .`array`
@@ -61,9 +60,9 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
             //println("${lecture.getLong("start")}: $startDate")
             //println("${lecture.getLong("end")}: $endDate")
             var event = VEvent()
-            var summary = event.setSummary(lecture.getString("description"))
+            var stpappSummary = stpappEvents.get(startDate.time)?.summary?.value ?: lecture.getString("description")
+            var summary = event.setSummary(stpappSummary)
             summary.language = "de-DE"
-            event.setDescription(lecture.getString("description"))
             event.setColor(lecture.getString("color"))
             event.setDateStart(startDate)
             event.setDateEnd(endDate)
@@ -84,8 +83,7 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
                 event.setLocation(room)
             }
             var lectururer = lecture.getString("instructor")
-            var lectureText = lecture.getString("description")
-            var description = "$lectureText\n"
+            var description = "$stpappSummary\n"
             description += "Dozent: $lectururer\n"
             description += "Raum: $room\n"
             event.setDescription(description)
