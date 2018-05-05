@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StpApp Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        #button_panel > a {
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section no-pad-bot">
+            <div class="container">
+                <div class="row center">
+                    <div class="col s12 m10 offset-m1">
+                        <h1 class="header">StpApp Calendar</h1>
+                    </div>
+                    <div class="col s12 m8 offset-m2">
+                        <h4 class="light">
+                            iCalendar-Files from <a href="http://stpapp.ba-leipzig.de">stpapp.ba-leipzig.de</a> and
+                            <a href="https://selfservice.campus-dual.de">CampusDual</a>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row center" id="button_panel">
+                    <a href="webcal://stp.ical" class="btn-large waves-effect waves-light">
+                        <i class="material-icons left">schedule</i>Schedule
+                    </a>
+                    <a href="webcal://meal.ical" class="btn-large waves-effect waves-light">
+                        <i class="material-icons left">local_dining</i>Meal
+                    </a>
+                    <a href="webcal://stpAndMeal.ical" class="btn-large waves-effect waves-light">
+                        <i class="material-icons left">event</i>Schedule and Meal
+                    </a>
+                </div>
+                <br>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
