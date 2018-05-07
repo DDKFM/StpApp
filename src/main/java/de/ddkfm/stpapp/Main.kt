@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 fun main(args : Array<String>) {
@@ -28,6 +29,26 @@ fun main(args : Array<String>) {
     File("./stpAndMeal.ical").writeText(Biweekly.write(globalCal).go(), Charset.forName("UTF-8"))
     File("./stp.ical").writeText(Biweekly.write(stpappCal).go(), Charset.forName("UTF-8"))
     File("./meal.ical").writeText(Biweekly.write(mealCal).go(), Charset.forName("UTF-8"))
+
+    generateChart()
+}
+
+data class Point(var x : Long, var y : Int)
+
+fun generateChart() {
+    var content = File("./chart_template.html").readText(charset = Charset.forName("UTF-8"))
+    var lines = File("./times.txt").readLines(charset = Charset.forName("UTF-8"))
+    var times = ArrayList<Point>()
+    for(line in lines) {
+        var x = line.split(":")[0].trim().toLong()
+        var y = line.split(":")[1].trim().replace("s", "").toInt()
+        times.add(Point(x, y))
+    }
+    var timesAsString = times
+            .map { "{x : new Date(${it.x}), y : ${it.y}}" }
+            .joinToString(separator = ",", prefix = "[", postfix = "]")
+    content = content.replace("##TIMES##", timesAsString)
+    File("./chart.html").writeText(content, charset = Charset.forName("UTF-8"))
 }
 fun getFullDate(date : String, time : String) : LocalDateTime {
     val year = date.split("/")[0].toInt()
@@ -50,6 +71,7 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
             .body
             .`array`
     println("time for fetching data from Campus-Dual: ${(System.currentTimeMillis() - startTime) / 1000}s")
+    File("./times.txt").appendText("${Date().time}: ${(System.currentTimeMillis() - startTime) / 1000}s\n")
     var cal = ICalendar()
     resp.forEach {
         var lecture = it as JSONObject

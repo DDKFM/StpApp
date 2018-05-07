@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StpApp Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png" href="event.png" sizes="any">
+    <style>
+        #button_panel > a {
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section no-pad-bot">
+            <div class="container">
+                <div class="row center">
+                    <div class="col s12 m10 offset-m1">
+                        <h1 class="header">Campus Dual Response Time</h1>
+                    </div>
+                </div>
+                <div class="row center" id="button_panel">
+                    <canvas height="300px" width="800px" id="chart"/>
+                </div>
+                <script type="text/javascript">
+                    var ctx = document.getElementById("chart").getContext('2d');
+                    var times = ##TIMES##
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            //labels: [new Date(62346733 * 1000), new Date(), new Date(), new Date()],
+                            datasets: [{
+                                label: 'Campus Dual Response Time',
+                                data: times,
+                                backgroundColor: [
+                                    'rgba(77, 182, 172, 0.5)',
+                                ],
+                                borderColor: [
+                                    'rgb(77, 182, 172)',
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    type:       "time",
+                                    time:       {
+                                        unit: 'minute',
+                                        format: 'DD.MM.YYYY HH:mm',
+                                        tooltipFormat: 'DD.MM.YYYY HH:mm',
+                                        displayFormats: {
+                                            'minute': 'DD.MM.YYYY hh:mm'
+                                        }
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Time'
+                                    }
+                                }],
+                                yAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Response-Time in Seconds'
+                                    }
+                                }]
+                            },
+
+                        }
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
