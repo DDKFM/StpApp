@@ -76,7 +76,7 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
                     var stpappRoom = stpappEvents.get(startDate.time)!!.location.value
                     stpappRoom = stpappRoom.replace("Raum", "").trim()
                     if(!room.trim().equals(stpappRoom)) {
-                        println("Kollision erkannt: $room <> $stpappRoom ($startDate)")
+                        println("collision detected: $room <> $stpappRoom ($startDate)")
                         room = "Raum $room(CampusDual) oder $stpappRoom (StpApp)"
                     }
                 }
