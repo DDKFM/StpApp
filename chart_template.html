@@ -20,70 +20,88 @@
     </style>
 </head>
 <body>
+<div class="container">
     <div class="container">
-        <div class="section no-pad-bot">
-            <div class="container">
-                <div class="row center">
-                    <div class="col s12 m10 offset-m1">
-                        <h1 class="header">Campus Dual Response Time</h1>
-                    </div>
-                </div>
-                <div class="row center" id="button_panel">
-                    <canvas height="300px" width="800px" id="chart"/>
-                </div>
-                <script type="text/javascript">
-                    var ctx = document.getElementById("chart").getContext('2d');
-                    var times = ##TIMES##
-                    var myChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            //labels: [new Date(62346733 * 1000), new Date(), new Date(), new Date()],
-                            datasets: [{
-                                label: 'Campus Dual Response Time',
-                                data: times,
-                                backgroundColor: [
-                                    'rgba(77, 182, 172, 0.5)',
-                                ],
-                                borderColor: [
-                                    'rgb(77, 182, 172)',
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                xAxes: [{
-                                    type:       "time",
-                                    time:       {
-                                        unit: 'minute',
-                                        format: 'DD.MM.YYYY HH:mm',
-                                        tooltipFormat: 'DD.MM.YYYY HH:mm',
-                                        displayFormats: {
-                                            'minute': 'DD.MM.YYYY hh:mm'
-                                        }
-                                    },
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Time'
-                                    }
-                                }],
-                                yAxes: [{
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Response-Time in Seconds'
-                                    },
-                                    ticks: {
-                                        beginAtZero: true,
-                                        min: 0
-                                    }
-                                }]
-                            },
-
-                        }
-                    });
-                </script>
+        <div class="row center">
+            <div class="col s12 m10 offset-m1">
+                <h4 class="header">Campus Dual Response Time</h4>
             </div>
         </div>
     </div>
+    <div class="row" id="button_panel">
+        <div class="col s12">
+            <canvas id="chart"/>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var ctx = document.getElementById("chart").getContext('2d');
+        var times = ##TIMES##
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    data: times,
+                    backgroundColor: [
+                        'rgba(77, 182, 172, 0.5)',
+                    ],
+                    borderColor: [
+                        'rgb(77, 182, 172)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    mode: 'x',
+                    callbacks: {
+                        label: function (tooltipItems, data) {
+                            console.log(tooltipItems);
+                            return "response time: " + tooltipItems.yLabel + "s"
+                        },
+                        labelColor: function(tooltipItem, chart) {
+                            return {
+                                borderColor: 'rgba(77, 182, 172, 0.5)',
+                                backgroundColor: 'rgb(77, 182, 172)'
+                            }
+                        },
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        type:"time",
+                        time: {
+                            unit: 'minute',
+                            stepSize: 60,
+                            format: 'DD.MM.YYYY HH:mm',
+                            tooltipFormat: 'DD.MM.YYYY HH:mm',
+                            displayFormats: {
+                                'minute': 'DD.MM HH:mm'
+                            }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel : {
+                            display: true,
+                            labelString: 'response time in seconds',
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            min: 0
+                        }
+                    }]
+                },
+                responsive: true
+            }
+        });
+    </script>
+</div>
 </body>
 </html>
