@@ -14,6 +14,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+var campusDualTime : Long = 0
+var stpappTime : Double = 0.0
 fun main(args : Array<String>) {
     val username = args[0]
     val password = args[1]
@@ -30,24 +32,40 @@ fun main(args : Array<String>) {
     File("./stp.ical").writeText(Biweekly.write(stpappCal).go(), Charset.forName("UTF-8"))
     File("./meal.ical").writeText(Biweekly.write(mealCal).go(), Charset.forName("UTF-8"))
 
+    File("./times.txt").appendText("${Date().time}|$campusDualTime|$stpappTime\n")
     generateChart()
 }
 
 data class Point(var x : Long, var y : Int)
+data class Point2(var x : Long, var y : Double)
 
 fun generateChart() {
     var content = File("./chart_template.html").readText(charset = Charset.forName("UTF-8"))
     var lines = File("./times.txt").readLines(charset = Charset.forName("UTF-8"))
     var times = ArrayList<Point>()
+    var timesStapp = ArrayList<Point2>()
     for(line in lines) {
-        var x = line.split(":")[0].trim().toLong()
-        var y = line.split(":")[1].trim().replace("s", "").toInt()
-        times.add(Point(x, y))
+        if(line.contains(":")) { //old method
+            var x = line.split(":")[0].trim().toLong()
+            var y = line.split(":")[1].trim().replace("s", "").toInt()
+            times.add(Point(x, y))
+        } else {
+            var x = line.split("|")[0].trim().toLong()
+            var y = line.split("|")[1].trim().toInt()
+            times.add(Point(x, y))
+            var y2 = line.split("|")[2].trim().toDouble()
+            timesStapp.add(Point2(x, y2))
+        }
+
     }
     var timesAsString = times
             .map { "{x : new Date(${it.x}), y : ${it.y}}" }
             .joinToString(separator = ",", prefix = "[", postfix = "]")
+    var timesStpAppAsString = timesStapp
+            .map { "{x : new Date(${it.x}), y : ${it.y}}" }
+            .joinToString(separator = ",", prefix = "[", postfix = "]")
     content = content.replace("##TIMES##", timesAsString)
+    content = content.replace("##TIMESSTPAPP##", timesStpAppAsString)
     File("./chart.html").writeText(content, charset = Charset.forName("UTF-8"))
 }
 fun getFullDate(date : String, time : String) : LocalDateTime {
@@ -71,7 +89,8 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
             .body
             .`array`
     println("time for fetching data from Campus-Dual: ${(System.currentTimeMillis() - startTime) / 1000}s")
-    File("./times.txt").appendText("${Date().time}: ${(System.currentTimeMillis() - startTime) / 1000}s\n")
+    campusDualTime = (System.currentTimeMillis() - startTime) / 1000
+    //File("./times.txt").appendText("${Date().time}: ${(System.currentTimeMillis() - startTime) / 1000}s\n")
     var cal = ICalendar()
     resp.forEach {
         var lecture = it as JSONObject
@@ -117,10 +136,12 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
     return cal
 }
 fun fetchStpAppLectures(username : String, password : String, group : String, stpappEvents : MutableMap<Long, VEvent>) : Long {
+    var startTime = System.currentTimeMillis()
     var resp = Unirest.get("http://stpapp.ba-leipzig.de/model/get/stundenplan.php?passwort=$password&benutzername=$username&seminargruppe=$group")
             .asJson()
             .body
             .`object`
+    stpappTime = (System.currentTimeMillis() - startTime) / 1000.0
     var data = resp.getJSONObject("data")
     var events = data.getJSONObject("termine")
     var lectures = data.getJSONObject("vorlesungen")
