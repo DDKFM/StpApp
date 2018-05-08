@@ -124,10 +124,21 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
                 event.setLocation(room)
             }
             var lectururer = lecture.getString("instructor")
+
             var description = "$stpappSummary\n"
             description += "Dozent: $lectururer\n"
             description += "Raum: $room\n"
             event.setDescription(description)
+            if(lecture.getString("remarks").contains("Prüfung")) {
+                //now only god knows
+                var examEvent = event.copy()
+                examEvent.setDescription(lecture.getString("description"))
+                examEvent.setLocation(lecture.getString("room"))
+                var examSummary = examEvent.setSummary(lecture.getString("description"))
+                examSummary.language = "de-DE"
+                cal.events.add(examEvent)
+                globalCal.events.add(examEvent)
+            }
             println(description)
             cal.events.add(event)
             globalCal.events.add(event)
