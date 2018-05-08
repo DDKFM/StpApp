@@ -36,7 +36,7 @@
     <script type="text/javascript">
         var ctx = document.getElementById("chart").getContext('2d');
         var times = ##TIMES##
-        var timesStp = ##TIMESSTPAPP##
+        var timesStp = ##TIMESTPAPP##
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -53,7 +53,7 @@
                 },{
                     data : timesStp,
                     backgroundColor: [
-                        'rgb(30, 136, 229, 0.5)',
+                        'rgba(30, 136, 229, 0.5)',
                     ],
                     borderColor: [
                         'rgb(30, 136, 229)',
@@ -75,10 +75,16 @@
                             return "response time: " + tooltipItems.yLabel + "s"
                         },
                         labelColor: function(tooltipItem, chart) {
-                            return {
-                                borderColor: 'rgba(77, 182, 172, 0.5)',
-                                backgroundColor: 'rgb(77, 182, 172)'
-                            }
+                            if(tooltipItem.datasetIndex == 0)
+                                return {
+                                    borderColor: 'rgba(77, 182, 172, 0.5)',
+                                    backgroundColor: 'rgb(77, 182, 172)'
+                                }
+                            else
+                                return {
+                                    borderColor: 'rgba(30, 136, 229, 0.5)',
+                                    backgroundColor: 'rgb(30, 136, 229)'
+                                }
                         },
                     }
                 },
