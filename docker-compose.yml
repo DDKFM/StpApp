@@ -1,0 +1,15 @@
+version : '3'
+services:
+  stpapp:
+    container_name: "stpapp"
+    image: stpapp
+    environment:
+      - STPAPP_USER=xxx
+      - STPAPP_PASSWORD=xxx
+      - STPAPP_GROUP=xxx
+      - CAMPUSDUAL_UID=xxx
+      - CAMPUSDUAL_HASH=xxx
+    volumes:
+      - /home/maximilian/IdeaProjects/StpApp/cal/:/cal/
+      - /home/maximilian/IdeaProjects/StpApp/chart/:/chart/
+      - /home/maximilian/IdeaProjects/StpApp/times.txt:/times/times.txt

@@ -4,6 +4,7 @@ import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import com.mashape.unirest.http.Unirest
+import com.xenomachina.argparser.ArgParser
 import org.json.JSONObject
 import java.io.File
 import java.nio.charset.Charset
@@ -17,31 +18,32 @@ import kotlin.collections.HashMap
 var campusDualTime : Long = 0
 var stpappTime : Double = 0.0
 fun main(args : Array<String>) {
-    val username = args[0]
-    val password = args[1]
-    val group = args[2]
 
-    var globalCal = ICalendar()
-    var mealCal = fetchMeal(globalCal)
-    var stpappEvents = HashMap<Long, VEvent>()
-    var minDay = fetchStpAppLectures(username, password, group, stpappEvents)
-    var stpappCal = fetchCampusDualLectures(matriculationNumber = "5000923", hash = "e1434034bda56b611b7d244f87e2301f",
-            minDay = minDay, stpappEvents = stpappEvents, globalCal = globalCal)
+    ArgParser(args).parseInto(::ParamParser).run {
+        println(args.joinToString())
+        var globalCal = ICalendar()
+        var mealCal = fetchMeal(globalCal)
+        var stpappEvents = HashMap<Long, VEvent>()
+        var minDay = fetchStpAppLectures(stpappUsername, stpappPasswd, stpappGroup, stpappEvents)
+        var stpappCal = fetchCampusDualLectures(matriculationNumber = campusDualMatriculationNumber, hash = campusDualHash,
+                minDay = minDay, stpappEvents = stpappEvents, globalCal = globalCal)
 
-    File("./stpAndMeal.ical").writeText(Biweekly.write(globalCal).go(), Charset.forName("UTF-8"))
-    File("./stp.ical").writeText(Biweekly.write(stpappCal).go(), Charset.forName("UTF-8"))
-    File("./meal.ical").writeText(Biweekly.write(mealCal).go(), Charset.forName("UTF-8"))
+        File("$icalOutputPath/stpAndMeal.ical").writeText(Biweekly.write(globalCal).go(), Charset.forName("UTF-8"))
+        File("$icalOutputPath/stp.ical").writeText(Biweekly.write(stpappCal).go(), Charset.forName("UTF-8"))
+        File("$icalOutputPath/meal.ical").writeText(Biweekly.write(mealCal).go(), Charset.forName("UTF-8"))
 
-    File("./times.txt").appendText("${Date().time}|$campusDualTime|$stpappTime\n")
-    generateChart()
+        File("$times").appendText("${Date().time}|$campusDualTime|$stpappTime\n")
+
+        generateChart(times, chartOutputPath)
+    }
 }
 
 data class Point(var x : Long, var y : Int)
 data class Point2(var x : Long, var y : Double)
 
-fun generateChart() {
+fun generateChart(times: String, chartOutputPath: String) {
     var content = File("./chart_template.html").readText(charset = Charset.forName("UTF-8"))
-    var lines = File("./times.txt").readLines(charset = Charset.forName("UTF-8"))
+    var lines = File("$times").readLines(charset = Charset.forName("UTF-8"))
     var times = ArrayList<Point>()
     var timesStapp = ArrayList<Point2>()
     for(line in lines) {
@@ -66,7 +68,7 @@ fun generateChart() {
             .joinToString(separator = ",", prefix = "[", postfix = "]")
     content = content.replace("##TIMES##", timesAsString)
     content = content.replace("##TIMESSTPAPP##", timesStpAppAsString)
-    File("./chart.html").writeText(content, charset = Charset.forName("UTF-8"))
+    File("$chartOutputPath/chart.html").writeText(content, charset = Charset.forName("UTF-8"))
 }
 fun getFullDate(date : String, time : String) : LocalDateTime {
     val year = date.split("/")[0].toInt()
