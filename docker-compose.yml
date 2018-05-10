@@ -2,7 +2,7 @@ version : '3'
 services:
   stpapp:
     container_name: "stpapp"
-    image: stpapp
+    image: ddkfm/stpapp
     environment:
       - STPAPP_USER=xxx
       - STPAPP_PASSWORD=xxx
