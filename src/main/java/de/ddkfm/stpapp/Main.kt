@@ -10,6 +10,7 @@ import java.io.File
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.ZoneId
 import java.util.*
 import kotlin.collections.ArrayList
@@ -70,13 +71,14 @@ fun generateChart(times: String, chartOutputPath: String) {
     content = content.replace("##TIMESSTPAPP##", timesStpAppAsString)
     File("$chartOutputPath/chart.html").writeText(content, charset = Charset.forName("UTF-8"))
 }
-fun getFullDate(date : String, time : String) : LocalDateTime {
+fun getFullDate(date : String, time : String) : Date {
     val year = date.split("/")[0].toInt()
     val month = date.split("/")[1].toInt()
     val day = date.split("/")[2].toInt()
     var hourDate = parseHourDate(time)
     var (hour, minute) = hourDate
-    return LocalDateTime.of(year, month, day, hour, minute)
+    var localDateTime = LocalDateTime.of(year, month, day, hour, minute)
+    return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant())
 }
 fun parseHourDate(hourDate : String) : HourDate {
     val hour = hourDate.toInt() / 60
@@ -103,12 +105,14 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
             //println("${lecture.getLong("start")}: $startDate")
             //println("${lecture.getLong("end")}: $endDate")
             var event = VEvent()
+            println("$lecture|${stpappEvents.get(startDate.time)}")
             var stpappSummary = stpappEvents.get(startDate.time)?.summary?.value ?: lecture.getString("description")
             var summary = event.setSummary(stpappSummary)
             summary.language = "de-DE"
             event.setColor(lecture.getString("color"))
             event.setDateStart(startDate)
             event.setDateEnd(endDate)
+
 
             var room = lecture.getString("room")
             if (!room.isEmpty()) {
@@ -131,6 +135,7 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
             description += "Dozent: $lectururer\n"
             description += "Raum: $room\n"
             event.setDescription(description)
+
             if(lecture.getString("remarks").contains("Prüfung")) {
                 //now only god knows
                 var examEvent = event.copy()
@@ -200,11 +205,11 @@ fun fetchStpAppLectures(username : String, password : String, group : String, st
             var start = getFullDate(day, time.split(".")[0])
             var end = getFullDate(day, time.split(".")[1])
 
-            var timeInMillis = start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            var timeInMillis = start.time
             minDay = Math.min(timeInMillis, minDay)
 
-            event.setDateStart(Date(start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
-            event.setDateEnd(Date(end.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
+            event.setDateStart(start)
+            event.setDateEnd(end)
             eventCal.addEvent(event)
             stpappEvents.put(timeInMillis, event)
         }
