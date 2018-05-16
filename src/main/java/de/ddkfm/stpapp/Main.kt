@@ -10,21 +10,18 @@ import java.io.File
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.Month
 import java.time.ZoneId
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 var campusDualTime : Long = 0
 var stpappTime : Double = 0.0
 fun main(args : Array<String>) {
-
     ArgParser(args).parseInto(::ParamParser).run {
         println(args.joinToString())
         var globalCal = ICalendar()
         var mealCal = fetchMeal(globalCal)
-        var stpappEvents = HashMap<Long, VEvent>()
+        var stpappEvents = TreeMap<Long, VEvent>()
         var minDay = fetchStpAppLectures(stpappUsername, stpappPasswd, stpappGroup, stpappEvents)
         var stpappCal = fetchCampusDualLectures(matriculationNumber = campusDualMatriculationNumber, hash = campusDualHash,
                 minDay = minDay, stpappEvents = stpappEvents, globalCal = globalCal)
@@ -98,14 +95,18 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
     var cal = ICalendar()
     resp.forEach {
         var lecture = it as JSONObject
+        if(lecture.getLong("start") >= 1526450400) {
+            var a = 5;
+        }
         var startDate = Date(lecture.getLong("start") * 1000)
+
         if(lecture.getLong("start") * 1000 >= minDay) {
             var endDate = Date(lecture.getLong("end") * 1000)
             //println(lecture.getString("description"))
             //println("${lecture.getLong("start")}: $startDate")
             //println("${lecture.getLong("end")}: $endDate")
             var event = VEvent()
-            println("$lecture|${stpappEvents.get(startDate.time)}")
+            println("A: $lecture B: ${stpappEvents.get(startDate.time)}")
             var stpappSummary = stpappEvents.get(startDate.time)?.summary?.value ?: lecture.getString("description")
             var summary = event.setSummary(stpappSummary)
             summary.language = "de-DE"
