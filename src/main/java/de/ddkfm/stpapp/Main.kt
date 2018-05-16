@@ -18,6 +18,7 @@ var campusDualTime : Long = 0
 var stpappTime : Double = 0.0
 fun main(args : Array<String>) {
     ArgParser(args).parseInto(::ParamParser).run {
+        println("#### Version 1.7 ####")
         println(args.joinToString())
         var globalCal = ICalendar()
         var mealCal = fetchMeal(globalCal)
