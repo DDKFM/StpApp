@@ -75,7 +75,7 @@ fun getFullDate(date : String, time : String) : Date {
     var hourDate = parseHourDate(time)
     var (hour, minute) = hourDate
     var localDateTime = LocalDateTime.of(year, month, day, hour, minute)
-    return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant())
+    return Date.from(localDateTime.atZone(ZoneId.of("Europe/Berlin")).toInstant())
 }
 fun parseHourDate(hourDate : String) : HourDate {
     val hour = hourDate.toInt() / 60
@@ -95,9 +95,6 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
     var cal = ICalendar()
     resp.forEach {
         var lecture = it as JSONObject
-        if(lecture.getLong("start") >= 1526450400) {
-            var a = 5;
-        }
         var startDate = Date(lecture.getLong("start") * 1000)
 
         if(lecture.getLong("start") * 1000 >= minDay) {
