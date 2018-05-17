@@ -1,5 +1,7 @@
 /.idea
 /target
+/cal
+/chart
 /*.ical
 /*.iml
 /*.jar
