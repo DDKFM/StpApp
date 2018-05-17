@@ -6,10 +6,12 @@ services:
     environment:
       - STPAPP_USER=xxx
       - STPAPP_PASSWORD=xxx
-      - STPAPP_GROUP=xxx
-      - CAMPUSDUAL_UID=xxx
-      - CAMPUSDUAL_HASH=xxx
+      - STPAPP_GROUP=xxxxx
+      - CAMPUSDUAL_UID=xxxxxxx
+      - CAMPUSDUAL_HASH=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
     volumes:
-      - /home/maximilian/IdeaProjects/StpApp/cal/:/cal/
-      - /home/maximilian/IdeaProjects/StpApp/chart/:/chart/
-      - /home/maximilian/IdeaProjects/StpApp/times.txt:/times/times.txt
+      - /home/ddkfm/docker/StpApp/cal/:/cal/
+      - /home/ddkfm/docker/StpApp/chart/:/chart/
+      - /home/ddkfm/docker/StpApp/times.txt:/times/times.txt
+
+
