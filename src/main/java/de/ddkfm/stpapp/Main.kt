@@ -5,6 +5,7 @@ import biweekly.ICalendar
 import biweekly.component.VEvent
 import com.mashape.unirest.http.Unirest
 import com.xenomachina.argparser.ArgParser
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.nio.charset.Charset
@@ -19,7 +20,7 @@ var stpappTime : Double = 0.0
 fun main(args : Array<String>) {
     ArgParser(args).parseInto(::ParamParser).run {
         println(args.joinToString())
-        println("#### Version 1.8 ####")
+        println("#### Version 1.9 ####")
         var globalCal = ICalendar()
         var mealCal = fetchMeal(globalCal)
         var stpappEvents = TreeMap<Long, VEvent>()
@@ -31,9 +32,11 @@ fun main(args : Array<String>) {
         File("$icalOutputPath/stp.ical").writeText(Biweekly.write(stpappCal).go(), Charset.forName("UTF-8"))
         File("$icalOutputPath/meal.ical").writeText(Biweekly.write(mealCal).go(), Charset.forName("UTF-8"))
 
-        File("$times").appendText("${Date().time}|$campusDualTime|$stpappTime\n")
 
-        generateChart(times, chartOutputPath)
+        if(withChart) {
+            File("$times").appendText("${Date().time}|$campusDualTime|$stpappTime\n")
+            generateChart(times, chartOutputPath)
+        }
     }
 }
 
@@ -86,10 +89,16 @@ fun parseHourDate(hourDate : String) : HourDate {
 
 fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: Long, stpappEvents: Map<Long, VEvent>, globalCal: ICalendar) : ICalendar {
     var startTime = System.currentTimeMillis()
-    var resp = Unirest.get("https://selfservice.campus-dual.de/room/json?userid=$matriculationNumber&hash=$hash") //start and end should be recognized in the response.....they should
-            .asJson()
-            .body
-            .`array`
+    var resp: JSONArray?
+    try {
+        resp = Unirest.get("https://selfservice.campus-dual.de/room/json?userid=$matriculationNumber&hash=$hash") //start and end should be recognized in the response.....they should
+                   .asJson()
+                   .body
+                   .`array`
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return ICalendar()
+    }
     println("time for fetching data from Campus-Dual: ${(System.currentTimeMillis() - startTime) / 1000}s")
     campusDualTime = (System.currentTimeMillis() - startTime) / 1000
     //File("./times.txt").appendText("${Date().time}: ${(System.currentTimeMillis() - startTime) / 1000}s\n")
@@ -154,11 +163,19 @@ fun fetchCampusDualLectures(matriculationNumber: String, hash: String, minDay: L
 }
 fun fetchStpAppLectures(username : String, password : String, group : String, stpappEvents : MutableMap<Long, VEvent>) : Long {
     var startTime = System.currentTimeMillis()
-    var resp = Unirest.get("http://stpapp.ba-leipzig.de/model/get/stundenplan.php?passwort=$password&benutzername=$username&seminargruppe=$group")
-            .asJson()
-            .body
-            .`object`
+    var resp: JSONObject?
+    try {
+        resp = Unirest.get("http://stpapp.ba-leipzig.de/model/get/stundenplan.php?passwort=$password&benutzername=$username&seminargruppe=$group")
+                   .asJson()
+                   .body
+                   .`object`
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return -1
+    }
     stpappTime = (System.currentTimeMillis() - startTime) / 1000.0
+    if(!(resp.has("data") && resp.has("termine") && resp.has("vorlesungen")))
+        return -1
     var data = resp.getJSONObject("data")
     var events = data.getJSONObject("termine")
     var lectures = data.getJSONObject("vorlesungen")
@@ -169,7 +186,6 @@ fun fetchStpAppLectures(username : String, password : String, group : String, st
     var eventCal = ICalendar()
     events.keySet().forEach {
         var day = it
-        var eventString = "Day $day \n"
         var dayData = events.getJSONObject(day)
         dayData.keySet().forEach {
             var time = it
@@ -217,10 +233,16 @@ fun fetchStpAppLectures(username : String, password : String, group : String, st
 }
 fun fetchMeal(globalCal : ICalendar) : ICalendar {
     var mealCal = ICalendar()
-    var mealResp = Unirest.get("http://stpapp.ba-leipzig.de/model/get/essen.php")
-            .asJson()
-            .body.
-            `object`
+    var mealResp: JSONObject?
+    try {
+        mealResp = Unirest.get("http://stpapp.ba-leipzig.de/model/get/essen.php")
+                   .asJson()
+                   .body.
+                   `object`
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return ICalendar()
+    }
     var data = mealResp.getJSONObject("data")
     data.keySet().forEach {
         var day = data.get(it)

@@ -1,11 +1,12 @@
 #!/bin/sh
 
 java -jar StpApp.jar \
-    -u $STPAPP_USER\
-    -p $STPAPP_PASSWORD\
-    -g $STPAPP_GROUP\
-    -m $CAMPUSDUAL_UID\
-    -c $CAMPUSDUAL_HASH\
-    -i /cal\
-    -k /chart\
-    -t /times/times.txt
+    --stpapp-username $STPAPP_USER \
+    --stpapp-password $STPAPP_PASSWORD \
+    --group $STPAPP_GROUP \
+    --campusdual-uid $CAMPUSDUAL_UID \
+    --campusdual-hash $CAMPUSDUAL_HASH \
+    --ical-output-path /cal \
+    --withChart \
+    --chart-output-path /chart \
+    --times-path /chart/times.txt

@@ -4,14 +4,11 @@ services:
     container_name: "stpapp"
     image: ddkfm/stpapp
     environment:
-      - STPAPP_USER=xxx
-      - STPAPP_PASSWORD=xxx
-      - STPAPP_GROUP=xxxxx
+      - STPAPP_USER=xxxxxx
+      - STPAPP_PASSWORD=xxxxxx
+      - STPAPP_GROUP=xxxxxx
       - CAMPUSDUAL_UID=xxxxxxx
-      - CAMPUSDUAL_HASH=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      - CAMPUSDUAL_HASH=xxxxxxxxxxxxxxxxxxxxxxxxxx
     volumes:
-      - /home/ddkfm/docker/StpApp/cal/:/cal/
-      - /home/ddkfm/docker/StpApp/chart/:/chart/
-      - /home/ddkfm/docker/StpApp/times.txt:/times/times.txt
-
-
+      - /home/ddkfm/StpApp/cal/:/cal/
+      - /home/ddkfm/StpApp/chart/:/chart/

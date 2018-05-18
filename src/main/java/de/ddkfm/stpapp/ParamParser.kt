@@ -20,11 +20,14 @@ class ParamParser(parser : ArgParser) {
             help = "Hash for Campus Dual")
 
     val icalOutputPath by parser.storing("-i", "--ical-output-path",
-            help = "output path for ical-files")
+            help = "output path for ical-files").default(".")
 
     val chartOutputPath by parser.storing("-k", "--chart-output-path",
-            help = "output path for chart.html")
+            help = "output path for chart.html").default("./chart")
 
     val times by parser.storing("-t", "--times-path",
-            help = "path to times.txt")
+            help = "path to times.txt").default("./times.txt")
+
+    val withChart by parser.flagging("-v", "--withChart",
+            help = "should the chart be generated").default(false)
 }
