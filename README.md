@@ -1,6 +1,7 @@
 # StpApp Calendar Fetcher
-The Kotlin-native implementation uses the stpapp.ba-leipzig.de URL and the "Campus Dual" to generate
-iCalendar-Files for lectures and meals.
+The Kotlin-native implementation use the data from stpapp.ba-leipzig.de and the "Campus Dual" to generate
+iCalendar-files for lectures and meals.
+
 ## required parameters
 ### StpApp
 
@@ -26,14 +27,14 @@ iCalendar-Files for lectures and meals.
 
 **--chart-output-path and --times-path are only recognized if --withChart flag is set**
 
-In docker containers the chart and times.txt are always generated. If you want to store these files out of the docker 
-container , you have to mount a volume in the docker container
+By using the docker-container, the withChart-option is always true. If you want to store these files on the docker host, 
+you have to mount a volume into the docker container
 
 ## Fetching-Order
 1. meal events(stpapp.ba-leipzig.de)
 2. all events from stpapp.ba-leipzig.de
 3. all events from Campus Dual
-4. the program compare the CampusDual and stpapp events and merge them (e.g. description from stpapp and room numbers 
+4. compare the CampusDual and stpapp events and merge them (e.g. description from stpapp and room numbers 
 from both)
 
 # Examples
