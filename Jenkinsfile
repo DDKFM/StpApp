@@ -1,6 +1,4 @@
 pipeline {
-    def app
-
     agent {
         docker {
             image 'maven:3-alpine'
@@ -14,7 +12,7 @@ pipeline {
             }
         }
         stage('Build Docker') {
-            app = docker.build("ddkfm/stpapp")
+            def app = docker.build("ddkfm/stpapp")
         }
     }
 }
