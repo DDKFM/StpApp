@@ -1,4 +1,6 @@
 pipeline {
+    def app
+
     agent {
         docker {
             image 'maven:3-alpine'
@@ -10,6 +12,9 @@ pipeline {
             steps {
                 sh 'mvn -B -DskipTests clean package'
             }
+        }
+        stage('Build Docker') {
+            app = docker.build("ddkfm/stpapp")
         }
     }
 }
