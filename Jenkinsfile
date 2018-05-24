@@ -12,7 +12,9 @@ pipeline {
             }
         }
         stage('Build Docker') {
-            def app = docker.build("ddkfm/stpapp")
+            steps {
+                def app = docker.build("ddkfm/stpapp")
+            }
         }
     }
 }
