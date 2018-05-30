@@ -174,7 +174,7 @@ fun fetchStpAppLectures(username : String, password : String, group : String, st
         return -1
     }
     stpappTime = (System.currentTimeMillis() - startTime) / 1000.0
-    if(!(resp.has("data") && resp.has("termine") && resp.has("vorlesungen")))
+    if(!(resp.has("data") && resp?.getJSONObject("data")!!.has("termine") && resp?.getJSONObject("data").has("vorlesungen")))
         return -1
     var data = resp.getJSONObject("data")
     var events = data.getJSONObject("termine")
