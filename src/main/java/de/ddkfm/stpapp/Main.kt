@@ -20,7 +20,7 @@ var stpappTime : Double = 0.0
 fun main(args : Array<String>) {
     ArgParser(args).parseInto(::ParamParser).run {
         println(args.joinToString())
-        println("#### Version 1.9 ####")
+        println("#### Version 2.0 ####")
         var globalCal = ICalendar()
         var mealCal = fetchMeal(globalCal)
         var stpappEvents = TreeMap<Long, VEvent>()
@@ -34,6 +34,7 @@ fun main(args : Array<String>) {
 
 
         if(withChart) {
+            generateCalendar(mealCal, stpappCal, chartOutputPath)
             File("$times").appendText("${Date().time}|$campusDualTime|$stpappTime\n")
             generateChart(times, chartOutputPath)
         }
@@ -43,6 +44,30 @@ fun main(args : Array<String>) {
 data class Point(var x : Long, var y : Int)
 data class Point2(var x : Long, var y : Double)
 
+fun generateCalendar(mealCal : ICalendar, calendar : ICalendar, chartOutputPath: String) {
+    var content = File("./calendar_template.html").readText()
+    var mealEvents = mealCal.events
+            .map {
+                var format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+                "{" +
+                        "title: '${it.description.value.replace("(\\n|\\r)".toRegex(), "")}'," +
+                        "start: '${format.format(Date(it.dateStart.value.time))}'," +
+                        "end: '${format.format(Date(it.dateEnd.value.time))}'," +
+                        "color: '#0ba021'}"
+            }
+    var events = calendar.events
+            .map {
+                var format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+                "{" +
+                        "title: '${it.description.value.replace("(\\n|\\r)".toRegex(), "")}'," +
+                        "start: '${format.format(Date(it.dateStart.value.time))}'," +
+                        "end: '${format.format(Date(it.dateEnd.value.time))}'," +
+                        "color: '#4286f4'}"
+            }
+    var eventsAsString = events.union(mealEvents).joinToString(separator = ",", prefix = "[", postfix = "]")
+    content = content.replace("##EVENTS##", eventsAsString)
+    File("$chartOutputPath/calendar.html").writeText(content)
+}
 fun generateChart(times: String, chartOutputPath: String) {
     var content = File("./chart_template.html").readText(charset = Charset.forName("UTF-8"))
     var lines = File("$times").readLines(charset = Charset.forName("UTF-8"))
